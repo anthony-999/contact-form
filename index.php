@@ -1,7 +1,7 @@
 <?php 
     include 'database.php';
         $nameError = $emailError = $contact_numberError = $messageError = '';
-        $name = $email = $contact_number = $message = '';
+        $fullname = $email = $contact_number = $user_message = '';
         $successMsg ='';
 
       
@@ -14,11 +14,11 @@
         // $message = $_POST['message'];
 
         // VALIDATE USER INPUT
-        if(empty($_POST['name']) ){
+        if(empty($_POST['fullname']) ){
             $nameError = 'Name is Required!';
 
         }else{
-            $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);      
+            $fullname = filter_input(INPUT_POST, 'fullname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);      
         }
         if(empty($_POST['email'])){
             $emailError = 'Email is Required!';
@@ -32,21 +32,27 @@
         }else{
             $contact_number = filter_input(INPUT_POST, 'contact_number', FILTER_SANITIZE_NUMBER_INT);
         }
-        if(empty($_POST['message'])){
+        if(empty($_POST['user_message'])){
             $messageError = 'Message is Required!';
 
         }else{
-            $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $user_message = filter_input(INPUT_POST, 'user_message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         }
 
-        if(!empty($name) && !empty($email) && !empty($contact_number) && !empty($message)){
-            $sql = 'INSERT INTO tbl_contact_form (name, email, contact_number, message)
-            VALUES ("' . $name . '", "' . $email . '", "' . $contact_number . '", "' . $message . '")';
+        if(!empty($fullname) && !empty($email) && !empty($contact_number) && !empty($user_message)){
+            $sql = 'INSERT INTO tbl_contact_form (fullname, email, contact_number, user_message)
+            VALUES ("' . $fullname . '", "' . $email . '", "' . $contact_number . '", "' . $user_message . '")';
     
-            $sqlQuery = mysqli_query($conn, $sql);
-    
-            
+            $sqlQuery = mysqli_query($conn, $sql);  
+
+            //Clear the input value after successful submission
+            // Set it to an empty string
+            $fullname = $email = $contact_number = $user_message = '';
+
             $successMsg = 'Your message is sent!';
+
+            
+           
             
         }
 
@@ -70,18 +76,24 @@
 
 
 </head>
-<body class="bg-success-subtle">
+<body class="bg-secondary">
 
-    <h3 class="text-center text-success mt-4" id="successMsg"><?php echo  $successMsg; ?></h3>
 
-    <div class="container-xl mt-5  rounded-4 " id="container">
+    <div class="container mt-5  rounded-4 " id="container">
 
 
         <form class="p-5" <?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?> method="post">
+        <div class="d-flex justify-content-end ">
+        <span class=" text-success" id="successMsg" ><?php echo $successMsg; ?></span>
+        </div>
+      
+
+
+
 
         <div class="mb-3">
                 <label for="name" class="form-label ">Name</label>
-                <input  class="form-control <?php echo !$nameError ? : 'is-invalid'; ?>" name="name" id="name" placeholder="John Doe">
+                <input  class="form-control <?php echo !$nameError ? : 'is-invalid'; ?>" name="fullname" id="name" placeholder="John Doe" value="<?php echo $fullname; ?>">
                     <div class="invalid-feedback">
                         <?php echo $nameError?>
                     </div>
@@ -89,7 +101,7 @@
             
             <div class="mb-3">
                 <label for="email" class="form-label">Email address</label>
-                <input type="email" class="form-control  <?php echo !$emailError ? : 'is-invalid'; ?>" name="email" id="email" placeholder="johndoe@email.com">
+                <input type="email" class="form-control  <?php echo !$emailError ? : 'is-invalid'; ?>" name="email" id="email" placeholder="johndoe@email.com" value="<?php echo $email; ?>">
                     <div class="invalid-feedback">
                         <?php echo $emailError?>
                     </div>
@@ -97,7 +109,7 @@
 
             <div class="mb-3">
                 <label for="contactnumber" class="form-label">Contact Number</label>
-                <input type="number" class="form-control <?php echo !$contact_numberError ? : 'is-invalid'; ?>"  name="contact_number" id="contactnumber" placeholder="+639123456789">
+                <input type="number" class="form-control <?php echo !$contact_numberError ? : 'is-invalid'; ?>"  name="contact_number" id="contactnumber" placeholder="+639123456789" value="<?php echo $contact_number; ?>">
                     <div class="invalid-feedback">
                         <?php echo $contact_numberError?>
                     </div>
@@ -105,14 +117,14 @@
             
             <div class="mb-3">
                 <label for="message" class="form-label">Message</label>
-                <textarea class="form-control <?php echo !$messageError ? : 'is-invalid'; ?>" name="message" id="message"  placeholder="Your message here" rows="3"></textarea>
+                <textarea class="form-control <?php echo !$messageError ? : 'is-invalid'; ?>" name="user_message" id="message"  placeholder="Your message here!" rows="3" ></textarea>
                     <div class="invalid-feedback">
                         <?php echo $messageError?>
                     </div>
             </div>
 
-            <div class="mb-3">
-              <input type="submit" value="Submit" name="submit" class="btn btn-primary">
+            <div class=" d-flex justify-content-end ">
+              <input type="submit" value="Submit" name="submit" class="btn btn-primary mt-4">
             </div>
 
         </form>
@@ -120,8 +132,12 @@
 
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;500;600;800;900&display=swap');
+        *{
+            font-family: 'Poppins', sans-serif;
+        }
         #container{
-            background: rgba(255,255,255,0.45);
+        background: rgba(255,255,255,0.45);
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255,255,255,0.225);
